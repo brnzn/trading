@@ -1,0 +1,39 @@
+logging.pattern.console: "[%date{ISO8601}] [%thread] %highlight(%-5level) %cyan(%logger{35}) - %msg %n"
+
+spring:
+  jpa:
+    hibernate.ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: ref
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: 'jdbc:h2:mem:test;MODE=Mysql;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS myschema;SCHEMA=myschema'
+
+#    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1;SCHEMA=ref
+
+hibernate.default_schema: myschema
+
+camel.springboot.jmxEnabled: false
+
+app:
+  broker:
+    url: vm://localhost?broker.persistent=false
+
+  camel:
+    publicationQueue: activemq:prices
+    dlq: activemq:prices:dlq
+    publicationTopic: activemq:topic:instruments
+
+    redelivery:
+      max: 5
+      maxDelay: 1
+      backOffMultiplier: 2
+      redeliveryDelay: 1000
+
+  maxInstrumentAge: 30
+
+cron:
+  sweeper: "*/5 * * * * *"
